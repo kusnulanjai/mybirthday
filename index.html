@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Sweet Seventeen – Kusnul</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --c1:#FCF8F8;
+  --c2:#FBEFEF;
+  --c3:#F9DFDF;
+  --c4:#F5AFAF;
+  --txt:#555;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif}
+
+body{
+  min-height:100vh;
+  background:linear-gradient(135deg,var(--c1),var(--c3));
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  overflow:hidden;
+}
+
+/* LOADER */
+#loader{position:fixed;inset:0;display:flex;justify-content:center;align-items:center;background:var(--c1);z-index:999}
+.loader-box{width:300px;background:#fff;padding:30px;border-radius:20px;text-align:center}
+.progress{height:10px;background:#eee;border-radius:10px;overflow:hidden;margin-top:10px}
+.bar{height:100%;width:0;background:var(--c4)}
+
+/* APP */
+#app{display:none;width:360px;background:var(--c2);border-radius:25px;padding:20px}
+
+.screen{background:#fff;padding:20px;border-radius:15px;text-align:center;margin-bottom:15px}
+
+.menu{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.menu button{padding:12px;border:none;border-radius:10px;font-weight:bold}
+
+.page{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;justify-content:center;align-items:center}
+.card{background:#fff;padding:20px;border-radius:20px;width:300px;text-align:center}
+
+/* GALLERY */
+.scroller{height:220px;overflow-y:scroll;border:2px dashed var(--c4);border-radius:10px}
+.scroller img{width:100%;height:220px;object-fit:cover;margin-bottom:10px}
+
+/* MUSIC */
+.music-box img{width:150px;border-radius:10px}
+
+/* TETRIS */
+.tetris-box{background:#fff;padding:20px;border-radius:20px;text-align:center}
+#tetrisCanvas{background:#000}
+
+/* POPUP */
+#gameOverPopup{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.5);
+  justify-content:center;align-items:center;
+}
+.popup-box{
+  background:#fff;padding:20px;border-radius:20px;text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<div id="loader">
+  <div class="loader-box">
+    <h2>Loading...</h2>
+    <div class="progress"><div class="bar" id="bar"></div></div>
+  </div>
+</div>
+
+<div id="app">
+
+<div class="screen">
+<h1>Happy Sweet Seventeen</h1>
+<p>Kusnul</p>
+</div>
+
+<div class="menu">
+<button onclick="openPage('msg')">MESSAGE</button>
+<button onclick="openPage('gal')">GALLERY</button>
+<button onclick="openPage('mus')">MUSIC</button>
+<button onclick="openGame()">TETRIS</button>
+</div>
+
+</div>
+
+<!-- MESSAGE -->
+<div class="page" id="msg">
+<div class="card">
+<p>Selamat ulang tahun 💕</p>
+<button onclick="closePage('msg')">Kembali</button>
+</div>
+</div>
+
+<!-- GALLERY -->
+<div class="page" id="gal">
+<div class="card">
+<div class="scroller">
+<img src="foto1.jpeg">
+<img src="foto2.jpeg">
+<img src="foto3.jpeg">
+</div>
+<button onclick="closePage('gal')">Kembali</button>
+</div>
+</div>
+
+<!-- MUSIC -->
+<div class="page" id="mus">
+<div class="card">
+<img id="coverImage" src="fotosound1.jpg">
+<p id="playlistTitle">Playlist</p>
+
+<button onclick="playSound(1)">Playlist 1</button>
+<button onclick="playSound(2)">Playlist 2</button>
+<button onclick="playSound(3)">Playlist 3</button>
+
+<button onclick="closePage('mus'); stopAll()">Kembali</button>
+</div>
+</div>
+
+<!-- TETRIS -->
+<div class="page" id="game">
+<div class="tetris-box">
+<canvas id="tetrisCanvas" width="200" height="400"></canvas><br>
+<button onclick="moveLeft()">◀</button>
+<button onclick="rotateBlock()">⟳</button>
+<button onclick="moveRight()">▶</button><br><br>
+<button onclick="closeTetris()">Kembali</button>
+</div>
+</div>
+
+<!-- POPUP -->
+<div id="gameOverPopup">
+<div class="popup-box">
+<h3>INGET YA!</h3>
+<p>walaupun kamu kalah,<br>tapi kamu menang di hati aku 💕<br><b>I LOVE YOU <3</b></p>
+<button onclick="closeGameOver()">OK</button>
+</div>
+</div>
+
+<script>
+
+/* LOADER */
+let p=0;
+let int=setInterval(()=>{
+p+=5;
+document.getElementById("bar").style.width=p+"%";
+if(p>=100){
+clearInterval(int);
+document.getElementById("loader").style.display="none";
+document.getElementById("app").style.display="block";
+}
+},50);
+
+/* PAGE */
+function openPage(id){document.getElementById(id).style.display="flex"}
+function closePage(id){document.getElementById(id).style.display="none"}
+
+/* MUSIC */
+let currentAudio=null;
+function playSound(n){
+if(currentAudio){currentAudio.pause()}
+let cover=document.getElementById("coverImage");
+if(n==1){cover.src="fotosound1.jpg";currentAudio=new Audio("sound1.mp3")}
+if(n==2){cover.src="fotosound2.jpeg";currentAudio=new Audio("sound2.mp3")}
+if(n==3){cover.src="fotosound3.jpeg";currentAudio=new Audio("sound3.mp3")}
+currentAudio.play();
+}
+function stopAll(){if(currentAudio){currentAudio.pause()}}
+
+/* TETRIS */
+const canvas=document.getElementById("tetrisCanvas");
+const ctx=canvas.getContext("2d");
+let x=4,y=0;
+
+function draw(){
+ctx.clearRect(0,0,200,400);
+ctx.fillStyle="pink";
+ctx.fillRect(x*20,y*20,20,20);
+}
+
+function drop(){
+y++;
+if(y>18){
+gameOver();
+return;
+}
+draw();
+}
+
+let loop;
+function openGame(){
+document.getElementById("game").style.display="flex";
+x=4;y=0;
+draw();
+loop=setInterval(drop,500);
+}
+
+function closeTetris(){
+clearInterval(loop);
+closePage('game');
+}
+
+function moveLeft(){x--;draw()}
+function moveRight(){x++;draw()}
+function rotateBlock(){}
+
+/* GAME OVER */
+function gameOver(){
+clearInterval(loop);
+showGameOver();
+}
+
+function showGameOver(){
+document.getElementById("gameOverPopup").style.display="flex";
+}
+function closeGameOver(){
+document.getElementById("gameOverPopup").style.display="none";
+closeTetris();
+}
+
+</script>
+
+</body>
+</html>
